@@ -19,15 +19,13 @@ public class PaymentServices {
         return payment.pay(amount);
     }
 
-    private void configurationFactory(String paymentType){
-        if(paymentType.equals("CREDIT_CARD")){
-            paymentFactory = new CreditCardFactory();
-        } else if (paymentType.equals("DEBIT_CARD")) {
-            paymentFactory = new DebitCardFactory();
-        }else if(paymentType.equals("PayPal")){
-            paymentFactory = new PaypalFactory();
-        }else{
-            throw new IllegalArgumentException("Método de pago no soportado");
+    private void configurationFactory(String paymentType) {
+        switch (paymentType) {
+            case "CREDIT_CARD" -> paymentFactory = new CreditCardFactory();
+            case "DEBIT_CARD" -> paymentFactory = new DebitCardFactory();
+            case "PAYPAL" -> paymentFactory = new PaypalFactory();
+            default -> throw new IllegalArgumentException("Método de pago no soportado");
         }
     }
+
 }

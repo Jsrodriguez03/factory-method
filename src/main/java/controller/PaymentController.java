@@ -19,7 +19,6 @@ public class PaymentController {
     public ResponseEntity<?> payPayment(@RequestParam String paymentType, @RequestParam double amount){
         double newFinalAmount = service.senderPayment(paymentType, amount);
         return ResponseEntity.ok(newFinalAmount);
-
     }
 
 }
