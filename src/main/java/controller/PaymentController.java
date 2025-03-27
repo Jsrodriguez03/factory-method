@@ -1,6 +1,6 @@
-package Main.Java.Controller;
+package main.java.Controller;
 
-import Main.Java.Services.PaymentServices;
+import main.java.services.PaymentServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +17,8 @@ public class PaymentController {
 
     @GetMapping("/pay")
     public ResponseEntity<?> payPayment(@RequestParam String paymentType, @RequestParam double amount){
-
-        return ResponseEntity.ok(service.payPayment(paymentType, amount));
+        double newFinalAmount = service.senderPayment(paymentType, amount);
+        return ResponseEntity.ok(newFinalAmount);
 
     }
 

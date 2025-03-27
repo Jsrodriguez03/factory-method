@@ -1,6 +1,6 @@
-package Main.Java.Domain;
+package main.java.domain;
 
-public class CreditCardPayment implements Payment {
+public class CreditCardPayment implements main.java.domain.Payment {
     double finalAmount = 0.0;
 
     @Override

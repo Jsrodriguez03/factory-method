@@ -1,4 +1,4 @@
-package Main.Java.Domain;
+package main.java.domain;
 
 public class PaypalPayment implements Payment {
     double finalAmount = 0.0;
