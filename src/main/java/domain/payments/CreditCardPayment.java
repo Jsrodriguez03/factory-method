@@ -1,4 +1,4 @@
-package main.java.domain;
+package domain.payments;
 
 public class CreditCardPayment extends Payment {
     public CreditCardPayment() {

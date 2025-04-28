@@ -1,4 +1,4 @@
-package main.java.domain;
+package domain.payments;
 
 public abstract class Payment {
     protected double commissionRate;

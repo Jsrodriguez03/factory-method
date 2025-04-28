@@ -1,6 +1,6 @@
-package domain.factory;
-import main.java.domain.PaypalPayment;
-import main.java.domain.Payment;
+package domain.factory.payments;
+import domain.payments.PaypalPayment;
+import domain.payments.Payment;
 
 public class PaypalFactory extends PaymentFactory{
     @Override

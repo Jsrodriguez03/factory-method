@@ -1,6 +1,6 @@
-package domain.factory;
-import main.java.domain.DebitCardPayment;
-import main.java.domain.Payment;
+package domain.factory.payments;
+import domain.payments.DebitCardPayment;
+import domain.payments.Payment;
 
 public class DebitCardFactory extends PaymentFactory{
     @Override

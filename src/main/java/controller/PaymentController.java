@@ -1,6 +1,7 @@
 package main.java.controller;
 
-import main.java.domain.*;
+import domain.enums.NotificationType;
+import main.java.domain.PaymentType;
 import main.java.services.PaymentServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,12 @@ public class PaymentController {
     }
 
     @PostMapping("/pay")
-    public ResponseEntity<?> payPayment(@RequestParam PaymentType paymentType, @RequestParam double amount){
-        double newFinalAmount = service.senderPayment(paymentType, amount);
+    public ResponseEntity<?> payPayment(
+            @RequestParam PaymentType paymentType,
+            @RequestParam double amount,
+            @RequestParam NotificationType notificationType
+    ) {
+        double newFinalAmount = service.senderPayment(paymentType, amount, notificationType);
         return ResponseEntity.ok(newFinalAmount);
     }
-
 }

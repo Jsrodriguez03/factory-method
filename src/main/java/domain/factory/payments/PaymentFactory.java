@@ -1,5 +1,5 @@
-package domain.factory;
-import main.java.domain.Payment;
+package domain.factory.payments;
+import domain.payments.Payment;
 
 public abstract class PaymentFactory {
 

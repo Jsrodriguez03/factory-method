@@ -1,23 +1,35 @@
 package main.java.services;
 
-import domain.factory.CreditCardFactory;
-import domain.factory.DebitCardFactory;
-import domain.factory.PaymentFactory;
-import domain.factory.PaypalFactory;
-import main.java.domain.*;
-import org.springframework.stereotype.Service;
+import domain.enums.NotificationType;
+import domain.factory.payments.CreditCardFactory;
+import domain.factory.payments.DebitCardFactory;
+import domain.factory.payments.PaymentFactory;
+import domain.factory.payments.PaypalFactory;
 import main.java.domain.PaymentType;
+import domain.payments.Payment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentServices {
+
     private PaymentFactory paymentFactory;
+
+    @Autowired
+    private main.java.services.NotificationServices notificationService;
 
     public PaymentServices() {}
 
-    public double senderPayment(PaymentType paymentType, double amount){
+    public double senderPayment(PaymentType paymentType, double amount, NotificationType notificationType) {
         configurationFactory(paymentType);
         Payment payment = paymentFactory.getPayment();
-        return payment.pay(amount);
+        double finalAmount = payment.pay(amount);
+
+        // Enviar notificación
+        String message = "Pago realizado exitosamente. Monto final: $" + finalAmount;
+        notificationService.sendNotification(notificationType, message);
+
+        return finalAmount;
     }
 
     private void configurationFactory(PaymentType paymentType) {
@@ -28,5 +40,4 @@ public class PaymentServices {
             default -> throw new IllegalArgumentException("Método de pago no soportado");
         }
     }
-
 }

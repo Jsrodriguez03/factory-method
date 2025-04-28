@@ -1,0 +1,8 @@
+package domain.notifications;
+
+public class WhatsappNotification implements Notification {
+    @Override
+    public void notifyUser(String message) {
+        System.out.println("Enviando WhatsApp: " + message);
+    }
+}
