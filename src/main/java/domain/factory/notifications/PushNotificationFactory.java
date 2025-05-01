@@ -1,11 +1,37 @@
 package domain.factory.notifications;
 
+import domain.builder.PushNotificationBuilder;
 import domain.notifications.Notification;
 import domain.notifications.PushNotification;
 
 public class PushNotificationFactory extends NotificationFactory {
+
+    private final String deviceToken;
+    private final String title;
+    private final String message;
+    private final String imageUrl;
+    private final String clickAction;
+    private final String priority;
+
+    public PushNotificationFactory(String deviceToken, String title, String message,
+                                   String imageUrl, String clickAction, String priority) {
+        this.deviceToken = deviceToken;
+        this.title = title;
+        this.message = message;
+        this.imageUrl = imageUrl;
+        this.clickAction = clickAction;
+        this.priority = priority;
+    }
+
     @Override
-    protected Notification createNotification() {
-        return new PushNotification();
+    public Notification createNotification() {
+        return new PushNotificationBuilder()
+                .setDeviceToken(deviceToken)
+                .setTitle(title)
+                .setMessage(message)
+                .setImageUrl(imageUrl)
+                .setClickAction(clickAction)
+                .setPriority(priority)
+                .build();
     }
 }

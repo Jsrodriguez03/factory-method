@@ -1,11 +1,36 @@
 package domain.factory.notifications;
 
+import domain.builder.SMSNotificationBuilder;
 import domain.notifications.Notification;
 import domain.notifications.SMSNotification;
 
+import java.time.LocalDateTime;
+
 public class SMSNotificationFactory extends NotificationFactory {
+
+    private final String phoneNumber;
+    private final String message;
+    private final String senderId;
+    private final boolean deliveryReportRequired;
+    private final LocalDateTime scheduleTime;
+
+    public SMSNotificationFactory(String phoneNumber, String message, String senderId,
+                                  boolean deliveryReportRequired, LocalDateTime scheduleTime) {
+        this.phoneNumber = phoneNumber;
+        this.message = message;
+        this.senderId = senderId;
+        this.deliveryReportRequired = deliveryReportRequired;
+        this.scheduleTime = scheduleTime;
+    }
+
     @Override
-    protected Notification createNotification() {
-        return new SMSNotification();
+    public Notification createNotification() {
+        return new SMSNotificationBuilder()
+                .setPhoneNumber(phoneNumber)
+                .setMessage(message)
+                .setSenderId(senderId)
+                .setDeliveryReportRequired(deliveryReportRequired)
+                .setScheduleTime(scheduleTime)
+                .build();
     }
 }

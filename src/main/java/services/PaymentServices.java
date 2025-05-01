@@ -1,6 +1,5 @@
 package main.java.services;
 
-import domain.enums.NotificationType;
 import domain.factory.payments.CreditCardFactory;
 import domain.factory.payments.DebitCardFactory;
 import domain.factory.payments.PaymentFactory;
@@ -13,31 +12,35 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentServices {
 
-    private PaymentFactory paymentFactory;
+    private final PaymentFactory creditCardFactory;
+    private final PaymentFactory debitCardFactory;
+    private final PaymentFactory paypalFactory;
 
     @Autowired
-    private main.java.services.NotificationServices notificationService;
-
-    public PaymentServices() {}
-
-    public double senderPayment(PaymentType paymentType, double amount, NotificationType notificationType) {
-        configurationFactory(paymentType);
-        Payment payment = paymentFactory.getPayment();
-        double finalAmount = payment.pay(amount);
-
-        // Enviar notificación
-        String message = "Pago realizado exitosamente. Monto final: $" + finalAmount;
-        notificationService.sendNotification(notificationType, message);
-
-        return finalAmount;
+    public PaymentServices(CreditCardFactory creditCardFactory,
+                           DebitCardFactory debitCardFactory,
+                           PaypalFactory paypalFactory) {
+        this.creditCardFactory = creditCardFactory;
+        this.debitCardFactory = debitCardFactory;
+        this.paypalFactory = paypalFactory;
     }
 
-    private void configurationFactory(PaymentType paymentType) {
+    public double senderPayment(PaymentType paymentType, double amount) {
+        PaymentFactory factory = getPaymentFactory(paymentType);
+        Payment payment = factory.getPayment();
+        return payment.pay(amount);  // Retorna el monto final después del pago
+    }
+
+    private PaymentFactory getPaymentFactory(PaymentType paymentType) {
         switch (paymentType) {
-            case CREDIT_CARD -> paymentFactory = new CreditCardFactory();
-            case DEBIT_CARD -> paymentFactory = new DebitCardFactory();
-            case PAYPAL -> paymentFactory = new PaypalFactory();
-            default -> throw new IllegalArgumentException("Método de pago no soportado");
+            case CREDIT_CARD:
+                return creditCardFactory;
+            case DEBIT_CARD:
+                return debitCardFactory;
+            case PAYPAL:
+                return paypalFactory;
+            default:
+                throw new IllegalArgumentException("Método de pago no soportado");
         }
     }
 }
