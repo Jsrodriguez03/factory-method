@@ -3,6 +3,8 @@ package main.java.dto;
 import domain.enums.NotificationType;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,6 +12,10 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL) // Excluir campos con valor null
 public class NotificationRequestDTO {
+    private main.java.domain.PaymentType paymentType;
+    private double amount;
+    @Getter
+    @Setter
     private NotificationType type;
 
     // Comunes
