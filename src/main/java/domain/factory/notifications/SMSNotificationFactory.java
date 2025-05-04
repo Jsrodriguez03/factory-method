@@ -1,8 +1,7 @@
 package domain.factory.notifications;
 
-import domain.builder.SMSNotificationBuilder;
+import domain.builder.Notifications.SMSNotificationBuilder;
 import domain.notifications.Notification;
-import domain.notifications.SMSNotification;
 
 import java.time.LocalDateTime;
 

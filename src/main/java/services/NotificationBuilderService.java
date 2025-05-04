@@ -1,13 +1,16 @@
 package services;
 
-import domain.builder.*;
+import domain.builder.Notifications.EmailNotificationBuilder;
+import domain.builder.Notifications.PushNotificationBuilder;
+import domain.builder.Notifications.SMSNotificationBuilder;
+import domain.builder.Notifications.WhatsAppNotificationBuilder;
 import domain.notifications.Notification;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationBuilderService {
 
-    public Notification buildNotification(main.java.dto.NotificationRequestDTO dto) {
+    public Notification buildNotification(main.java.dto.NotificationRequest dto) {
         return switch (dto.getType()) {
             case EMAIL -> EmailNotificationBuilder.builder()
                     .setTo(dto.getTo())

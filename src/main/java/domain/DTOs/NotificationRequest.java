@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL) // Excluir campos con valor null
-public class NotificationRequestDTO {
+public class NotificationRequest {
     private main.java.domain.PaymentType paymentType;
     private double amount;
     @Getter

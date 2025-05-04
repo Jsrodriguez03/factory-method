@@ -1,12 +1,14 @@
 package main.java.controller;
 
+import domain.DTOs.ReportConfig;
+import domain.builder.Report.PDFReportBuilder;
+import domain.builder.Report.ReportDirector;
 import domain.enums.NotificationType;
 import main.java.domain.PaymentType;
 import main.java.services.PaymentServices;
 import main.java.services.NotificationServices;
-import main.java.dto.NotificationRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class PaymentController {
     }
 
     @PostMapping("/notification")
-    public ResponseEntity<?> notificationPayment(@RequestBody NotificationRequestDTO dto) {
+    public ResponseEntity<?> notificationPayment(@RequestBody main.java.dto.NotificationRequest dto) {
         // Calcula el nuevo monto
         double newFinalAmount = paymentService.senderPayment(dto.getPaymentType(), dto.getAmount());
 
@@ -52,8 +54,21 @@ public class PaymentController {
         return ResponseEntity.ok(dto);
     }
 
+    @PostMapping("/reporte-pago")
+    public ResponseEntity<byte[]> generarReporte(@RequestBody ReportConfig config) {
+        PDFReportBuilder builder = new PDFReportBuilder();
+        ReportDirector director = new ReportDirector(builder);
+        byte[] pdf = director.constructReport(config);
 
-    private void cleanUpDTO(NotificationRequestDTO dto, NotificationType notificationType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("attachment").filename("reporte.pdf").build());
+
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+    }
+
+
+    private void cleanUpDTO(main.java.dto.NotificationRequest dto, NotificationType notificationType) {
         // Limpiar campos que no sean necesarios según el tipo de notificación
         if (notificationType != NotificationType.EMAIL) {
             dto.setTo(null);

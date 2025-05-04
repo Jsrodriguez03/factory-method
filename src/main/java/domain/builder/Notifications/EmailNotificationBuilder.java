@@ -1,4 +1,4 @@
-package domain.builder;
+package domain.builder.Notifications;
 
 import domain.notifications.EmailNotification;
 import java.util.List;

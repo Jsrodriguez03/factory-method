@@ -1,8 +1,7 @@
 package domain.factory.notifications;
 
-import domain.builder.PushNotificationBuilder;
+import domain.builder.Notifications.PushNotificationBuilder;
 import domain.notifications.Notification;
-import domain.notifications.PushNotification;
 
 public class PushNotificationFactory extends NotificationFactory {
 

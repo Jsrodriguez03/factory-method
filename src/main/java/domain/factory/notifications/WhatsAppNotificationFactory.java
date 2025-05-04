@@ -1,8 +1,7 @@
 package domain.factory.notifications;
 
-import domain.builder.WhatsAppNotificationBuilder;
+import domain.builder.Notifications.WhatsAppNotificationBuilder;
 import domain.notifications.Notification;
-import domain.notifications.WhatsappNotification;
 
 import java.util.List;
 

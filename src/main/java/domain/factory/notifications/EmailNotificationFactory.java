@@ -1,7 +1,6 @@
 package domain.factory.notifications;
 
-import domain.builder.EmailNotificationBuilder;
-import domain.notifications.EmailNotification;
+import domain.builder.Notifications.EmailNotificationBuilder;
 import domain.notifications.Notification;
 
 import java.util.List;
