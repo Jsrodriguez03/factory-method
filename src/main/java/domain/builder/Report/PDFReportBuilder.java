@@ -2,6 +2,7 @@ package domain.builder.Report;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
@@ -29,33 +30,39 @@ public class PDFReportBuilder implements ReportBuilder {
     private String paymentTotal;
     private String paymentTax;
 
+    private BaseColor backgroundColor;
+    private BaseColor textColor;
+    private BaseColor separatorColor;
+
     @Override
     public void reset() {
         outputStream = new ByteArrayOutputStream();
-        Rectangle pageSize = PageSize.A4;
+        Rectangle pageSize = "LETTER".equalsIgnoreCase(format) ? PageSize.LETTER : PageSize.A4;
 
-        if ("LETTER".equalsIgnoreCase(format)) {
-            pageSize = PageSize.LETTER;
+        // Theme-based color settings
+        if ("dark".equalsIgnoreCase(theme)) {
+            backgroundColor = BaseColor.BLACK;
+            textColor = BaseColor.WHITE;
+            separatorColor = BaseColor.LIGHT_GRAY;
+        } else {
+            backgroundColor = BaseColor.WHITE;
+            textColor = BaseColor.BLACK;
+            separatorColor = BaseColor.LIGHT_GRAY;
         }
 
-        document = new Document(pageSize);
+        document = new Document(pageSize, 50, 50, 50, 50);
         try {
             writer = PdfWriter.getInstance(document, outputStream);
             document.open();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    @Override
-    public void setTitle(String title) {
-        this.title = title;
-        document.addTitle(title);
-        try {
-            Paragraph p = new Paragraph(title, new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
-            p.setAlignment(Element.ALIGN_CENTER);
-            p.setSpacingAfter(20);
-            document.add(p);
+            if ("dark".equalsIgnoreCase(theme)) {
+                // Add black rectangle as background
+                PdfContentByte canvas = writer.getDirectContentUnder();
+                canvas.setColorFill(backgroundColor);
+                canvas.rectangle(0, 0, pageSize.getWidth(), pageSize.getHeight());
+                canvas.fill();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -67,7 +74,7 @@ public class PDFReportBuilder implements ReportBuilder {
         if (includeLogo) {
             try {
                 Image img = Image.getInstance("classpath:logo.png");
-                img.scaleToFit(100, 100);
+                img.scaleToFit(80, 80);
                 img.setAlignment(Image.ALIGN_RIGHT);
                 document.add(img);
             } catch (Exception e) {
@@ -77,38 +84,100 @@ public class PDFReportBuilder implements ReportBuilder {
     }
 
     @Override
+    public void setTitle(String title) {
+        this.title = title;
+        document.addTitle(title);
+        try {
+            Paragraph p = new Paragraph(title.toUpperCase(),
+                    new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, textColor));
+            p.setAlignment(Element.ALIGN_CENTER);
+            p.setSpacingAfter(10);
+            document.add(p);
+
+            LineSeparator separator = new LineSeparator();
+            separator.setLineColor(separatorColor);
+            document.add(new Chunk(separator));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void setPaymentDetails(boolean includePaymentDetails) {
         this.includePaymentDetails = includePaymentDetails;
 
         if (includePaymentDetails) {
             try {
-                Paragraph p = new Paragraph();
-                p.setFont(new Font(Font.FontFamily.HELVETICA, 12));
+                Paragraph sectionTitle = new Paragraph("Detalles del Pago",
+                        new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, textColor));
+                sectionTitle.setSpacingBefore(15);
+                sectionTitle.setSpacingAfter(10);
+                document.add(sectionTitle);
 
-                p.add("Detalles del Pago:\n\n");
-                p.add("- Método de Pago: " + paymentType + "\n");
-                p.add("- Monto Inicial: $" + paymentAmount + " USD\n");
-                p.add("- Impuesto: $" + paymentTax + " USD\n");
-                p.add("- Total a Pagar: $" + paymentTotal + " USD\n");
+                PdfPTable table = new PdfPTable(2);
+                table.setWidthPercentage(100);
+                table.setSpacingAfter(15);
+                table.setWidths(new int[]{1, 2});
 
-                p.setSpacingAfter(15);
-                document.add(p);
+                addPaymentRow(table, "Método de Pago:", paymentType);
+                addPaymentRow(table, "Monto Inicial:", "$" + paymentAmount + " USD");
+                addPaymentRow(table, "Impuesto:", "$" + paymentTax + " USD");
+                addPaymentRow(table, "Total a Pagar:", "$" + paymentTotal + " USD");
+
+                document.add(table);
+
+                LineSeparator separator = new LineSeparator();
+                separator.setLineColor(separatorColor);
+                document.add(new Chunk(separator));
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    private void addPaymentRow(PdfPTable table, String label, String value) {
+        Font labelFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, textColor);
+        Font valueFont = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL, textColor);
+
+        PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
+        PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+
+        labelCell.setBorder(Rectangle.NO_BORDER);
+        valueCell.setBorder(Rectangle.NO_BORDER);
+        labelCell.setBackgroundColor(backgroundColor);
+        valueCell.setBackgroundColor(backgroundColor);
+
+        table.addCell(labelCell);
+        table.addCell(valueCell);
+    }
 
     @Override
     public void setUserInfo(boolean includeUserInfo) {
         this.includeUserInfo = includeUserInfo;
         if (includeUserInfo) {
             try {
-                Paragraph p = new Paragraph("Usuario:\n- Nombre: Santiago Rodriguez\n- Email: santiago@gmail.com",
-                        new Font(Font.FontFamily.HELVETICA, 12));
-                p.setSpacingAfter(15);
-                document.add(p);
+                Paragraph sectionTitle = new Paragraph("Información del Usuario",
+                        new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, textColor));
+                sectionTitle.setSpacingBefore(15);
+                sectionTitle.setSpacingAfter(10);
+                document.add(sectionTitle);
+
+                PdfPTable table = new PdfPTable(2);
+                table.setWidthPercentage(100);
+                table.setWidths(new int[]{1, 2});
+                table.setSpacingAfter(15);
+
+                addPaymentRow(table, "Nombre:", "Santiago Rodriguez");
+                addPaymentRow(table, "Email:", "santiago@gmail.com");
+
+                document.add(table);
+
+                LineSeparator separator = new LineSeparator();
+                separator.setLineColor(separatorColor);
+                document.add(new Chunk(separator));
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -118,7 +187,6 @@ public class PDFReportBuilder implements ReportBuilder {
     @Override
     public void setTheme(String theme) {
         this.theme = theme;
-        // Aquí podrías personalizar estilos para temas como "DARK", etc.
     }
 
     @Override
@@ -127,8 +195,11 @@ public class PDFReportBuilder implements ReportBuilder {
         if (includeTimestamp) {
             try {
                 String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                Paragraph p = new Paragraph("Fecha de emisión: " + time, new Font(Font.FontFamily.HELVETICA, 10));
+                Paragraph p = new Paragraph("Fecha de emisión: " + time,
+                        new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC, textColor));
+                p.setSpacingBefore(10);
                 p.setSpacingAfter(15);
+                p.setAlignment(Element.ALIGN_RIGHT);
                 document.add(p);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -141,7 +212,12 @@ public class PDFReportBuilder implements ReportBuilder {
         this.footerMessage = footerMessage;
         if (footerMessage != null && !footerMessage.isEmpty()) {
             try {
-                Paragraph p = new Paragraph(footerMessage, new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC));
+                LineSeparator separator = new LineSeparator();
+                separator.setLineColor(separatorColor);
+                document.add(new Chunk(separator));
+
+                Paragraph p = new Paragraph(footerMessage,
+                        new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC, textColor));
                 p.setAlignment(Element.ALIGN_CENTER);
                 p.setSpacingBefore(20);
                 document.add(p);
