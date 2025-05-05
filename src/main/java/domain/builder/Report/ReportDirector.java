@@ -5,17 +5,20 @@ public class ReportDirector {
 
     public ReportDirector(ReportBuilder builder) {
         this.builder = builder;
-        builder.reset();
     }
 
     public void construirReporte(domain.dto.PDFReportRequest request) {
+        builder.setTheme(request.getTheme());
         builder.setFormat(request.getFormat());
+
+        builder.reset();
+
         builder.setLogo(request.isIncludeLogo());
         builder.setTitle(request.getTitle());
+        builder.setTimestamp(request.isIncludeTimestamp());
         builder.setUserInfo(request.isIncludeUserInfo());
         builder.setPaymentDetails(request.isIncludePaymentDetails());
-        builder.setTheme(request.getTheme());
-        builder.setTimestamp(request.isIncludeTimestamp());
+
         builder.setFooter(request.getFooterMessage());
     }
 }

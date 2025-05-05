@@ -33,6 +33,7 @@ public class PDFReportBuilder implements ReportBuilder {
     private BaseColor backgroundColor;
     private BaseColor textColor;
     private BaseColor separatorColor;
+    private boolean isDarkTheme;
 
     @Override
     public void reset() {
@@ -40,15 +41,16 @@ public class PDFReportBuilder implements ReportBuilder {
         Rectangle pageSize = "LETTER".equalsIgnoreCase(format) ? PageSize.LETTER : PageSize.A4;
 
         // Theme-based color settings
-        if ("dark".equalsIgnoreCase(theme)) {
+        if (isDarkTheme) {
             backgroundColor = BaseColor.BLACK;
             textColor = BaseColor.WHITE;
             separatorColor = BaseColor.LIGHT_GRAY;
         } else {
             backgroundColor = BaseColor.WHITE;
             textColor = BaseColor.BLACK;
-            separatorColor = BaseColor.LIGHT_GRAY;
+            separatorColor = BaseColor.DARK_GRAY;
         }
+
 
         document = new Document(pageSize, 50, 50, 50, 50);
         try {
@@ -66,6 +68,12 @@ public class PDFReportBuilder implements ReportBuilder {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setTheme(String theme) {
+        this.theme = theme;
+        this.isDarkTheme = "dark".equalsIgnoreCase(theme);
     }
 
     @Override
@@ -91,7 +99,7 @@ public class PDFReportBuilder implements ReportBuilder {
             Paragraph p = new Paragraph(title.toUpperCase(),
                     new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, textColor));
             p.setAlignment(Element.ALIGN_CENTER);
-            p.setSpacingAfter(10);
+            p.setSpacingAfter(5);
             document.add(p);
 
             LineSeparator separator = new LineSeparator();
@@ -102,6 +110,7 @@ public class PDFReportBuilder implements ReportBuilder {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void setPaymentDetails(boolean includePaymentDetails) {
@@ -185,14 +194,10 @@ public class PDFReportBuilder implements ReportBuilder {
     }
 
     @Override
-    public void setTheme(String theme) {
-        this.theme = theme;
-    }
-
-    @Override
     public void setTimestamp(boolean includeTimestamp) {
         this.includeTimestamp = includeTimestamp;
-        if (includeTimestamp) {
+        System.out.println("setTimestamp called: " + includeTimestamp); // <-- DEBUG
+        if (!includeTimestamp) {
             try {
                 String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 Paragraph p = new Paragraph("Fecha de emisión: " + time,
@@ -206,6 +211,7 @@ public class PDFReportBuilder implements ReportBuilder {
             }
         }
     }
+
 
     @Override
     public void setFooter(String footerMessage) {
