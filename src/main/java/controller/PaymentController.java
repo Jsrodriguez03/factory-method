@@ -1,6 +1,6 @@
 package main.java.controller;
 
-import domain.DTOs.ReportConfig;
+
 import domain.builder.Report.PDFReportBuilder;
 import domain.builder.Report.ReportDirector;
 import domain.enums.NotificationType;
@@ -55,16 +55,22 @@ public class PaymentController {
     }
 
     @PostMapping("/reporte-pago")
-    public ResponseEntity<byte[]> generarReporte(@RequestBody ReportConfig config) {
+    public ResponseEntity<byte[]> generarPDF(@RequestBody domain.dto.PDFReportRequest request) {
         PDFReportBuilder builder = new PDFReportBuilder();
+        builder.setPaymentAmount(request.getPaymentAmount());
+        builder.setPaymentType(request.getPaymentType());
+        builder.setPaymentTax(request.getPaymentTax());
+        builder.setPaymentTotal(request.getPaymentTotal());
+
         ReportDirector director = new ReportDirector(builder);
-        byte[] pdf = director.constructReport(config);
+        director.construirReporte(request);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDisposition(ContentDisposition.builder("attachment").filename("reporte.pdf").build());
+        byte[] pdfBytes = builder.build();
 
-        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Factura.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
     }
 
 

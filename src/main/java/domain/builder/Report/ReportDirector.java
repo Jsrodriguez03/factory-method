@@ -1,24 +1,21 @@
 package domain.builder.Report;
 
-import domain.DTOs.ReportConfig;
-
 public class ReportDirector {
     private final ReportBuilder builder;
 
     public ReportDirector(ReportBuilder builder) {
         this.builder = builder;
+        builder.reset();
     }
 
-    public byte[] constructReport(ReportConfig config) {
-        builder.setFormat(config.format);
-        builder.reset();
-        builder.setLogo(config.includeLogo);
-        builder.setTitle(config.title);
-        builder.setPaymentDetails(config.includePaymentDetails);
-        builder.setUserInfo(config.includeUserInfo);
-        builder.setTheme(config.theme);
-        builder.setTimestamp(config.includeTimestamp);
-        builder.setFooter(config.footerMessage);
-        return builder.build();
+    public void construirReporte(domain.dto.PDFReportRequest request) {
+        builder.setFormat(request.getFormat());
+        builder.setLogo(request.isIncludeLogo());
+        builder.setTitle(request.getTitle());
+        builder.setUserInfo(request.isIncludeUserInfo());
+        builder.setPaymentDetails(request.isIncludePaymentDetails());
+        builder.setTheme(request.getTheme());
+        builder.setTimestamp(request.isIncludeTimestamp());
+        builder.setFooter(request.getFooterMessage());
     }
 }

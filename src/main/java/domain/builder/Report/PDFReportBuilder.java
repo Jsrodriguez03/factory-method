@@ -1,22 +1,14 @@
 package domain.builder.Report;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
-
 import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
+import lombok.Setter;
 
-
-import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Setter
 public class PDFReportBuilder implements ReportBuilder {
 
     private Document document;
@@ -31,6 +23,11 @@ public class PDFReportBuilder implements ReportBuilder {
     private boolean includeTimestamp;
     private String footerMessage;
     private String format;
+
+    private String paymentType;
+    private String paymentAmount;
+    private String paymentTotal;
+    private String paymentTax;
 
     @Override
     public void reset() {
@@ -82,10 +79,18 @@ public class PDFReportBuilder implements ReportBuilder {
     @Override
     public void setPaymentDetails(boolean includePaymentDetails) {
         this.includePaymentDetails = includePaymentDetails;
+
         if (includePaymentDetails) {
             try {
-                Paragraph p = new Paragraph("Detalles del Pago:\n- Tipo: Tarjeta de Crédito\n- Número: ****-****-****-1234",
-                        new Font(Font.FontFamily.HELVETICA, 12));
+                Paragraph p = new Paragraph();
+                p.setFont(new Font(Font.FontFamily.HELVETICA, 12));
+
+                p.add("Detalles del Pago:\n\n");
+                p.add("- Método de Pago: " + paymentType + "\n");
+                p.add("- Monto Inicial: $" + paymentAmount + " USD\n");
+                p.add("- Impuesto: $" + paymentTax + " USD\n");
+                p.add("- Total a Pagar: $" + paymentTotal + " USD\n");
+
                 p.setSpacingAfter(15);
                 document.add(p);
             } catch (Exception e) {
@@ -94,12 +99,13 @@ public class PDFReportBuilder implements ReportBuilder {
         }
     }
 
+
     @Override
     public void setUserInfo(boolean includeUserInfo) {
         this.includeUserInfo = includeUserInfo;
         if (includeUserInfo) {
             try {
-                Paragraph p = new Paragraph("Usuario:\n- Nombre: Juan Pérez\n- Email: juan@example.com",
+                Paragraph p = new Paragraph("Usuario:\n- Nombre: Santiago Rodriguez\n- Email: santiago@gmail.com",
                         new Font(Font.FontFamily.HELVETICA, 12));
                 p.setSpacingAfter(15);
                 document.add(p);
@@ -112,7 +118,7 @@ public class PDFReportBuilder implements ReportBuilder {
     @Override
     public void setTheme(String theme) {
         this.theme = theme;
-        // Aquí podrías cambiar estilos o colores si haces una versión DARK.
+        // Aquí podrías personalizar estilos para temas como "DARK", etc.
     }
 
     @Override
