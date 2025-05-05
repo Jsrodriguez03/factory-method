@@ -1,9 +1,16 @@
 package domain.builder.Report;
 
-public interface ReportBuilder {
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.DocumentException;
+
+import java.io.IOException;
+
+public interface ReportBuilder extends Cloneable {
+    PDFReportBuilder clone();
+
     void reset();
     void setTitle(String title);
-    void setLogo(boolean includeLogo);
+    void setLogo(boolean includeLogo) throws DocumentException, IOException;
     void setPaymentDetails(boolean includePaymentDetails);
     void setUserInfo(boolean includeUserInfo);
     void setTheme(String theme);
@@ -13,3 +20,5 @@ public interface ReportBuilder {
 
     byte[] build(); // Devuelve el PDF como byte[]
 }
+
+

@@ -3,14 +3,17 @@ package domain.builder.Report;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
+import domain.Prototype.Prototype;
 import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Setter
-public class PDFReportBuilder implements ReportBuilder {
+public class PDFReportBuilder implements ReportBuilder, Prototype<PDFReportBuilder> {
 
     private Document document;
     private ByteArrayOutputStream outputStream;
@@ -34,6 +37,32 @@ public class PDFReportBuilder implements ReportBuilder {
     private BaseColor textColor;
     private BaseColor separatorColor;
     private boolean isDarkTheme;
+
+    // MÉTODO CLONE: Clona el estado sin interferir con el diseño
+    @Override
+    public PDFReportBuilder clone() {
+        PDFReportBuilder clone = new PDFReportBuilder();
+        clone.includeLogo = this.includeLogo;
+        clone.title = this.title;
+        clone.includePaymentDetails = this.includePaymentDetails;
+        clone.includeUserInfo = this.includeUserInfo;
+        clone.theme = this.theme;
+        clone.includeTimestamp = this.includeTimestamp;
+        clone.footerMessage = this.footerMessage;
+        clone.format = this.format;
+
+        clone.paymentType = this.paymentType;
+        clone.paymentAmount = this.paymentAmount;
+        clone.paymentTotal = this.paymentTotal;
+        clone.paymentTax = this.paymentTax;
+
+        clone.isDarkTheme = this.isDarkTheme;
+        clone.backgroundColor = this.backgroundColor;
+        clone.textColor = this.textColor;
+        clone.separatorColor = this.separatorColor;
+
+        return clone;
+    }
 
     @Override
     public void reset() {
@@ -77,18 +106,18 @@ public class PDFReportBuilder implements ReportBuilder {
     }
 
     @Override
-    public void setLogo(boolean includeLogo) {
+    public void setLogo(boolean includeLogo) throws DocumentException, IOException {
         this.includeLogo = includeLogo;
-        if (includeLogo) {
-            try {
-                Image img = Image.getInstance("classpath:logo.png");
-                img.scaleToFit(80, 80);
-                img.setAlignment(Image.ALIGN_RIGHT);
-                document.add(img);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        URL imageUrl = getClass().getClassLoader().getResource("logo.png");
+        if (imageUrl != null) {
+            Image img = Image.getInstance(imageUrl);
+            img.scaleToFit(80, 80);
+            img.setAlignment(Image.ALIGN_RIGHT);
+            document.add(img);
+        } else {
+            System.err.println("Logo no encontrado en classpath.");
         }
+
     }
 
     @Override

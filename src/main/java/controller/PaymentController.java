@@ -1,6 +1,7 @@
 package main.java.controller;
 
 
+import com.itextpdf.text.DocumentException;
 import domain.builder.Report.PDFReportBuilder;
 import domain.builder.Report.ReportDirector;
 import domain.enums.NotificationType;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -55,18 +57,43 @@ public class PaymentController {
     }
 
     @PostMapping("/reporte-pago")
-    public ResponseEntity<byte[]> generarPDF(@RequestBody domain.dto.PDFReportRequest request) {
-        PDFReportBuilder builder = new PDFReportBuilder();
+    public ResponseEntity<byte[]> generarPDF(@RequestBody domain.dto.PDFReportRequest request) throws DocumentException, IOException {
+        // 1. Crear el prototipo con valores base
+        PDFReportBuilder prototype = new PDFReportBuilder();
+        prototype.setTheme("light"); // Valor base
+        prototype.setFormat("A4");   // Valor base
+        prototype.setIncludeLogo(false);
+        prototype.setIncludePaymentDetails(false);
+        prototype.setIncludeUserInfo(false);
+        prototype.setIncludeTimestamp(false);
+
+        // 2. Clonar el prototipo para personalizar el builder según el request
+        PDFReportBuilder builder = prototype.clone();
+        builder.reset();
+
+        // 3. Asignar valores personalizados desde el request (manteniendo tu diseño actual)
         builder.setPaymentAmount(request.getPaymentAmount());
         builder.setPaymentType(request.getPaymentType());
         builder.setPaymentTax(request.getPaymentTax());
         builder.setPaymentTotal(request.getPaymentTotal());
 
+        builder.setIncludeLogo(request.isIncludeLogo());
+        builder.setIncludePaymentDetails(request.isIncludePaymentDetails());
+        builder.setIncludeUserInfo(request.isIncludeUserInfo());
+        builder.setIncludeTimestamp(request.isIncludeTimestamp());
+
+        builder.setTheme(request.getTheme());
+        builder.setFormat(request.getFormat());
+        builder.setFooterMessage(request.getFooterMessage());
+        builder.setTitle(request.getTitle());
+
+        // 4. Construir el reporte usando tu lógica actual
         ReportDirector director = new ReportDirector(builder);
-        director.construirReporte(request);
+        director.construirReporte(request); // <- tu método original
 
         byte[] pdfBytes = builder.build();
 
+        // 5. Devolver el PDF
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Factura.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
